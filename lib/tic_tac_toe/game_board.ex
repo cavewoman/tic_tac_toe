@@ -48,7 +48,19 @@ defmodule TicTacToe.GameBoard do
   # Begin exercise 1
   ##
   def chunk_rows(game_board_spaces) do
-    # YOUR CODE GOES HERE
+    chunk_rows(Enum.take(game_board_spaces, 9), [], [])
+  end
+
+  def chunk_rows([], current, chunks) do
+    chunks ++ [current]
+  end
+
+  def chunk_rows([h|t], current, chunks) when length(current) == 3 do
+    chunk_rows(t, [h], chunks ++ [current])
+  end
+
+  def chunk_rows([h|t], current, chunks) do
+    chunk_rows(t, current ++ [h], chunks)
   end
   ##
   # End exercise 1
@@ -62,7 +74,17 @@ defmodule TicTacToe.GameBoard do
   def space_to_str({_, nil}), do: "   "
 
   def row_to_str(row) do
-    # YOUR CODE GOES HERE
+    row_to_str(row, "")
+  end
+
+  def row_to_str([], string), do: string
+
+  def row_to_str([h|t], "") do
+    row_to_str(t, space_to_str(h))
+  end
+
+  def row_to_str([h|t], string) do
+    row_to_str(t, "#{string}|#{space_to_str(h)}")
   end
   ##
   # End exercise 2
@@ -96,8 +118,14 @@ defmodule TicTacToe.GameBoard do
     end
   end
 
+  def fetch_win_variants(_, [], coll), do: coll
+
   def fetch_win_variants(gb = %TicTacToe.GameBoard{}) do
-    # YOUR CODE GOES HERE
+    fetch_win_variants(gb, @win_conditions, [])
+  end
+
+  def fetch_win_variants(gb, [h|t], coll) do
+    fetch_win_variants(gb, t, coll ++ [variant_has_winner?(gb, h)])
   end
   ##
   # End exercise 3
@@ -107,8 +135,18 @@ defmodule TicTacToe.GameBoard do
   # Begin exercise 4
   ##
   def check_win(gb = %TicTacToe.GameBoard{}) do
-    # YOUR CODE GOES HERE
+    gb
+      |> fetch_win_variants()
+      |> check_for_winner()
   end
+
+  def check_for_winner([]), do: false
+
+  def check_for_winner([head|tail]) when head == false do
+    check_for_winner(tail)
+  end
+
+  def check_for_winner([head|_]), do: head
   ##
   # End exercise 4
   ##
